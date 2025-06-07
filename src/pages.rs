@@ -9,6 +9,8 @@ use std::fmt;
 use std::collections::HashMap;
 use std::str::FromStr;
 
+use crate::gamegrid::GameGrid;
+
 use pelican_ui_std::{
     Padding, Offset, Size,
     RoundedRectangle,
@@ -16,18 +18,20 @@ use pelican_ui_std::{
     Header, Content, AppPage,
 };
 
-const BOARD_SIZE: usize = 10;
-const SQUARE_SIZE: f32 = 30.0;
+pub const BOARD_SIZE: usize = 9;
+pub const SQUARE_SIZE: f32 = 40.0;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub enum Entity {
-    Ship
+    Player,
+    None
 }
 
 impl Entity {
     pub fn build(&self, ctx: &mut Context) -> Sprite {
         match self {
-            Entity::Ship => Ship::new(ctx)
+            Entity::Player => Ship::new(ctx),
+            Entity::None => Sprite::empty(ctx)
         }
     }
 }
@@ -40,7 +44,7 @@ pub struct GameState {
 impl GameState {
     pub fn new(ctx: &mut Context) -> Self {
         let mut sprites = HashMap::new();
-        sprites.insert(Coords(5, 8).to_string(), Entity::Ship);
+        sprites.insert(Coords(4, 8).to_string(), Entity::Player);
 
         GameState {
             sprites,
@@ -82,7 +86,7 @@ impl MyGame {
         ctx.state().set(&game_state);
         println!("game_state {:?}", game_state);
 
-        let content = Content::new(Offset::Center, vec![Box::new(GameGrid::new(ctx))]);
+        let content = Content::new(Offset::Center, vec![Box::new(GameGrid::new(ctx, game_state))]);
         let header = Header::stack(ctx, None, "My Game", None);
 
         MyGame(Stack::default(), Page::new(header, content, None), false)
@@ -90,61 +94,6 @@ impl MyGame {
 }
 
 impl OnEvent for MyGame {}
-
-#[derive(Debug, Component)]
-pub struct GameGrid(Column, Vec<GridRow>);
-impl OnEvent for GameGrid {}
-
-impl GameGrid {
-    pub fn new(ctx: &mut Context) -> Self {
-        let mut rows = Vec::new();
-
-        for col in 0..BOARD_SIZE {
-            rows.push(GridRow::new(ctx, col));
-        }
-
-        GameGrid(Column::center(4.0), rows)
-    }
-}
-
-#[derive(Debug, Component)]
-pub struct GridRow(Row, Vec<GridBox>);
-impl OnEvent for GridRow {}
-
-impl GridRow {
-    pub fn new(ctx: &mut Context, col: usize) -> Self {
-        let mut sprites = ctx.state().get::<GameState>().sprites;
-        let color = ctx.theme.colors.background.secondary;
-        let mut boxes = Vec::new();
-
-        for row in 0..BOARD_SIZE {
-            match sprites.remove(&Coords(row, col).to_string()) {
-                Some(sprite) => {
-                    let sprite = sprite.build(ctx);
-                    boxes.push(GridBox::new(ctx, Some(sprite)));
-                },
-                None => boxes.push(GridBox::new(ctx, None)),
-            }
-        }
-
-        GridRow(Row::center(4.0), boxes)
-    }
-}
-
-#[derive(Debug, Component)]
-pub struct GridBox(Stack, RoundedRectangle, Option<Sprite>);
-impl OnEvent for GridBox {}
-
-impl GridBox {
-    pub fn new(ctx: &mut Context, sprite: Option<Sprite>) -> Self {
-        let color = ctx.theme.colors.background.secondary;
-        GridBox(
-            Stack(Offset::Center, Offset::Center, Size::Static(SQUARE_SIZE), Size::Static(SQUARE_SIZE), Padding::default()),
-            RoundedRectangle::new(0.0, 4.0, color), 
-            sprite
-        )
-    }
-}
 
 pub struct Ship;
 impl Ship {
@@ -154,12 +103,20 @@ impl Ship {
 }
 
 #[derive(Debug, Component)]
-pub struct Sprite(Stack, Image);
+pub struct Sprite(Stack, Option<Image>, Option<Bin<Stack, RoundedRectangle>>); // image, background
 impl OnEvent for Sprite {}
 impl Sprite {
     #[allow(clippy::new_ret_no_self)]
     pub fn new(ctx: &mut Context, path: &str, size: f32) -> Sprite {
         let img = image::load_from_memory(&ctx.assets.load_file(path).unwrap()).unwrap();
-        Sprite(Stack::center(), Image{shape: ShapeType::Rectangle(0.0, (size, size)), image: ctx.assets.add_image(img.into()), color: None})
+        Sprite(Stack::center(), Some(Image{shape: ShapeType::Rectangle(0.0, (size, size)), image: ctx.assets.add_image(img.into()), color: None}), None)
+    }
+
+    pub fn empty(ctx: &mut Context) -> Sprite {
+        let color = ctx.theme.colors.background.secondary;
+        Sprite(Stack::center(), None, Some(Bin(
+            Stack(Offset::Center, Offset::Center, Size::Static(SQUARE_SIZE), Size::Static(SQUARE_SIZE), Padding::default()),
+            RoundedRectangle::new(0.0, 4.0, color)
+        )))
     }
 }

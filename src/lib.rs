@@ -7,6 +7,7 @@ use std::fs::{DirEntry, File};
 
 mod pages;
 use crate::pages::MyGame;
+mod gamegrid;
 
 pub struct MyApp;
 impl Services for MyApp {
