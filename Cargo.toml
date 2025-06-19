@@ -9,6 +9,7 @@ include_dir = { version = "0.7.4", features = ["glob"] }
 pelican_ui = {path = "../pelican_ui" }
 pelican_ui_std = { path = "../pelican_ui_std" }
 serde = "1.0.219"
+uuid = { version = "1.17.0", features = ["v4"] }
 
 [lib]
 name="main"
