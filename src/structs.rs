@@ -71,9 +71,8 @@ impl Sprite {
 
 impl OnEvent for Sprite {
     fn on_event(&mut self, ctx: &mut Context, event: &mut dyn Event) -> bool {
-        if let Some(TickEvent) = event.downcast_ref::<TickEvent>() {
-            (self.2)(ctx, event)
-        }
+        // println!("EVENT TRIGGERED {:?}", event);
+        (self.2)(ctx, event);
         true
     }
 }
