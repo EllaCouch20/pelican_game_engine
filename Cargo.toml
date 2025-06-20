@@ -13,4 +13,5 @@ uuid = { version = "1.17.0", features = ["v4"] }
 
 [lib]
 name="main"
+path="src/lib.rs"
 crate-type=["staticlib", "cdylib", "rlib"]
