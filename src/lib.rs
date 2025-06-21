@@ -1,8 +1,8 @@
 mod sprite;
-pub use crate::sprite::{Sprite, SpriteImage};
+pub use crate::sprite::*;
 
 mod gameboard;
-pub use crate::gameboard::Gameboard;
+pub use crate::gameboard::*;
 
 mod events;
-pub use crate::events::CollisionEvent;
+pub use crate::events::*;

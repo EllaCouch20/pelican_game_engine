@@ -1,21 +1,21 @@
-use pelican_ui::Context;
+use pelican_ui::{Context, Component};
 use pelican_ui::drawable::{Drawable, Image, ShapeType};
 use pelican_ui_std::Offset;
 
 pub trait Sprite: Drawable {
-    fn size(&self, ctx: &mut Context) -> (f32, f32);
+    fn dimensions(&self) -> (f32, f32);
     fn position(&self, max_size: (f32, f32)) -> (f32, f32);
-    fn offset(&self) -> (&mut Offset, &mut Offset);
-    fn id(&self) -> uuid::Uuid;
+    fn offset(&mut self) -> (&mut Offset, &mut Offset);
+    fn id(&self) -> u32;
 }
 
-pub struct SpriteImage(pub Image);
+pub struct SpriteImage;
 
 impl SpriteImage {
-    pub fn new(ctx: &mut Context, path: &str, size: (f32, f32)) -> Self {
+    pub fn new(ctx: &mut Context, path: &str, size: (f32, f32)) -> Image {
         let bytes = ctx.assets.add_image(image::load_from_memory(&ctx.assets.load_file(path).unwrap()).unwrap().into());
         let image = Image{shape: ShapeType::Rectangle(0.0, (size.0, size.1)), image: bytes, color: None}; 
-        SpriteImage(image)
+        image
     }
 }
 
