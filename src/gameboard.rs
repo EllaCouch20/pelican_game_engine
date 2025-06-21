@@ -91,19 +91,41 @@ pub enum AspectRatio {
     SixteenNine,
 }
 
+
+// impl AspectRatio {
+//     pub fn size(&self, size: (f32, f32)) -> (f32, f32) {
+//         let max = size.0.max(size.1);
+//         let min = size.0.min(size.1);
+//         match self {
+//             AspectRatio::OneOne => (min, min),
+//             AspectRatio::TwoThree => (size.0 > size.1).then(|| (max, max * 0.6667)).unwrap_or_else(|| (max * 0.6667, max)),
+//             AspectRatio::FourFive => (size.0 > size.1).then(|| (max, max * 0.8)).unwrap_or_else(|| (max * 0.8, max)),
+//             AspectRatio::FiveSeven => (size.0 > size.1).then(|| (max, max * 0.7143)).unwrap_or_else(|| (max * 0.7143, max)),
+//             AspectRatio::SixteenNine => (size.0 > size.1).then(|| (max, max * 0.5625)).unwrap_or_else(|| (max * 0.5625, max))
+//         }
+//     }
+// }
+
 impl AspectRatio {
-    pub fn size(&self, size: (f32, f32)) -> (f32, f32) {
-        let max = size.0.max(size.1);
-        let min = size.0.min(size.1);
-        match self {
-            AspectRatio::OneOne => (min, min),
-            AspectRatio::TwoThree => (size.0 > size.1).then(|| (max, max * 0.6667)).unwrap_or_else(|| (max * 0.6667, max)),
-            AspectRatio::FourFive => (size.0 > size.1).then(|| (max, max * 0.8)).unwrap_or_else(|| (max * 0.8, max)),
-            AspectRatio::FiveSeven => (size.0 > size.1).then(|| (max, max * 0.7143)).unwrap_or_else(|| (max * 0.7143, max)),
-            AspectRatio::SixteenNine => (size.0 > size.1).then(|| (max, max * 0.5625)).unwrap_or_else(|| (max * 0.5625, max))
+    pub fn size(&self, screen_size: (f32, f32)) -> (f32, f32) {
+        let (screen_w, screen_h) = screen_size;
+        let mut aspect = match self {
+            AspectRatio::OneOne => 1.0,
+            AspectRatio::TwoThree => 2.0 / 3.0,
+            AspectRatio::FourFive => 4.0 / 5.0,
+            AspectRatio::FiveSeven => 5.0 / 7.0,
+            AspectRatio::SixteenNine => 16.0 / 9.0,
+        };
+
+        match screen_w > screen_h {
+            true if screen_h < screen_w * aspect => (screen_h * aspect, screen_h),
+            false if screen_w < screen_h * aspect => (screen_w, screen_w * aspect),
+            true => (screen_w, screen_w * aspect),
+            false => (screen_h * aspect, screen_h),
         }
     }
 }
+
 
 #[derive(Debug)]
 pub struct GameGrid(Vec<(Offset, Offset)>, AspectRatio);
