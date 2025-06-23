@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 image = "0.25.6"
 include_dir = { version = "0.7.4", features = ["glob"] }
+indexmap = "2.9.0"
 pelican_ui = {path = "../pelican_ui" }
 pelican_ui_std = { path = "../pelican_ui_std" }
 serde = "1.0.219"

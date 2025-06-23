@@ -63,7 +63,7 @@ dependencies = [
 
 [[package]]
 name = "air"
-version = "0.2.3"
+version = "0.2.4"
 dependencies = [
  "async-trait",
  "chrono",
@@ -2726,6 +2726,7 @@ version = "0.1.0"
 dependencies = [
  "image 0.25.6",
  "include_dir",
+ "indexmap 2.9.0",
  "pelican_ui",
  "pelican_ui_std",
  "serde",
