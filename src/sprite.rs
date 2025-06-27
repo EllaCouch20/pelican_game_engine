@@ -5,6 +5,8 @@ use pelican_ui::{Context, Component};
 
 use pelican_ui_std::{Stack, Offset, Size, Padding, OutlinedRectangle, Bin};
 
+use crate::GameboardSize;
+
 #[derive(Debug, Component)]
 pub struct Sprite(Stack, Image, #[skip] String, #[skip] (Offset, Offset), #[skip] (f32, f32));
 impl OnEvent for Sprite {}
@@ -24,10 +26,39 @@ impl Sprite {
         }
     }
 
-    // fn offset(&mut self) -> (&mut Offset, &mut Offset) {(&mut self.2.0, &mut self.2.1)}
     pub fn id(&self) -> &String { &self.2 }
 
+    // This is not the total position, just the original offsets provided
     pub fn offset(&self) -> &(Offset, Offset) { &self.3 }
 
-    pub fn position(&mut self) -> &mut (f32, f32) { &mut self.4 }
+    // this is the total position
+    pub fn position(&mut self, ctx: &mut Context) -> (f32, f32) {
+        let max = ctx.state().get_or_default::<GameboardSize>().get();
+        let pos = self.adjustments().clone();
+        let dims = self.dimensions().clone();
+        let x = self.offset().0.get(dims.0, max.0).abs() + pos.0;
+        let y = self.offset().1.get(dims.1, max.1).abs() + pos.1;
+        (x, y)
+    }
+
+    // This is not the total position, just the adjustments to be made to the offsets
+    pub fn adjustments(&mut self) -> &mut (f32, f32) { &mut self.4 }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum SpriteAction {
+    MoveLeft,
+    MoveRight,
+    MoveUp,
+    MoveDown,
+    Jump,
+    Idle,
+    Attack,
+    Hurt,
+    Die,
+    Shoot,
+    Slide,
+    Fall,
+    Land,
+    Crouch,
 }
