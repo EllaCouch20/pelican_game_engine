@@ -51,19 +51,55 @@ type OnGameEvent = Box<dyn FnMut(&mut Gameboard, &mut Context, &mut dyn Event) -
 
 /// Gameboard structure that contains the background and all sprites. Triggers a provided OnGameEvent when an event happens
 #[derive(Component)]
-pub struct Gameboard(pub GameLayout, pub GameboardBackground, pub IndexMap<String, Sprite>, #[skip] Option<OnGameEvent>);
+pub struct Gameboard(pub GameLayout, pub GameboardBackground, pub Vec<Sprite>, #[skip] Option<OnGameEvent>);
 
 impl Gameboard {
     pub fn new(ctx: &mut Context, aspect_ratio: AspectRatio, on_event: OnGameEvent) -> Self {
         let colors = ctx.theme.colors;
         let background = GameboardBackground::new(ctx, 1.0, 8.0, colors.background.secondary, aspect_ratio);
-        Gameboard(GameLayout::new(IndexMap::from([("background".to_string(), (Offset::Start, Offset::Start))]), aspect_ratio), background, IndexMap::new(), Some(on_event))
+        Gameboard(GameLayout::new(vec![(Offset::Start, Offset::Start)], aspect_ratio), background, Vec::new(), Some(on_event))
     }
 
     pub fn insert_sprite(&mut self, ctx: &mut Context, sprite: Sprite) {
         println!("Adding new sprite {:?}", sprite);
-        self.0.0.insert(sprite.id().to_string(), *sprite.offset());
-        self.2.insert(sprite.id().to_string(), sprite);
+        self.0.0.push(*sprite.offset());
+        self.2.push(sprite);
+    }
+
+    pub fn remove_sprite(&mut self, sprite: &Sprite) {
+        if let Some(index) = self.2.iter().position(|item| item.id() == sprite.id()) {
+            self.2.remove(index);
+            self.0.0.remove(index);
+        }
+    }
+
+    pub fn remove_sprite_by_id(&mut self, id: &str) {
+        if let Some(index) = self.2.iter().position(|item| item.id() == id) {
+            self.2.remove(index);
+            self.0.0.remove(index);
+        }
+    }
+    
+    pub fn get_sprite_by_id(&mut self, id: &str) -> Option<&mut Sprite> {
+        if let Some(index) = self.2.iter().position(|item| item.id() == id) {
+            Some(self.2.get_mut(index).unwrap())
+        } else {
+            None
+        }
+    }
+
+    pub fn update_positions(&mut self, ctx: &mut Context) {
+        self.2.iter_mut().enumerate().for_each(|(i, s)| {
+            let (x, y) = s.position(ctx);
+            self.0.0.get_mut(i).as_mut().map(|pos| {
+                pos.0 = Offset::Static(x);
+                pos.1 = Offset::Static(y);
+            });
+        });
+    }
+
+    pub fn contains_id(&self, id: &str) -> bool {
+        self.2.iter().position(|item| item.id() == id).is_some()
     }
 }
 
@@ -72,6 +108,7 @@ impl OnEvent for Gameboard {
         let mut callback = self.3.take().expect("callback should be set");
         let result = callback(self, ctx, event);
         self.3 = Some(callback);
+        println!("result is {:?}", result);
         result
     }
 }
@@ -86,10 +123,10 @@ impl std::fmt::Debug for Gameboard {
 /// #[skip] and positions them on the screen using their corresponding offsets
 
 #[derive(Debug, Default)]
-pub struct GameLayout(pub IndexMap<String, (Offset, Offset)>, AspectRatio);
+pub struct GameLayout(pub Vec<(Offset, Offset)>, AspectRatio);
 
 impl GameLayout {
-    pub fn new(offsets: IndexMap<String, (Offset, Offset)>, ratio: AspectRatio) -> Self {
+    pub fn new(offsets: Vec<(Offset, Offset)>, ratio: AspectRatio) -> Self {
         GameLayout(offsets, ratio)
     }
 
@@ -114,7 +151,8 @@ impl Layout for GameLayout {
 
     fn build(&self, _ctx: &mut Context, max_size: (f32, f32), children: Vec<SizeRequest>) -> Vec<Area> {
         let new_size = self.1.size(max_size);
-        children.into_iter().zip(self.0.clone().values()).map(|(c, offset)| {
+        children.into_iter().zip(self.0.clone()).map(|(c, offset)| {
+            // println!("CHILD {:?} OFFSETS {:?}", c, offset);
             let size = c.get(new_size);
             let x = offset.0.get(new_size.0, size.0);
             let y = offset.1.get(new_size.1, size.1);

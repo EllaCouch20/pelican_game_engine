@@ -12,9 +12,9 @@ pub struct Sprite(Stack, Image, #[skip] String, #[skip] (Offset, Offset), #[skip
 impl OnEvent for Sprite {}
 
 impl Sprite {
-    pub fn new(ctx: &mut Context, id: &str, path: &str, size: (f32, f32), offsets: (Offset, Offset)) -> Self {
-        let bytes = ctx.assets.add_image(image::load_from_memory(&ctx.assets.load_file(path).unwrap()).unwrap().into());
-        let image = Image{shape: ShapeType::Rectangle(0.0, (size.0, size.1)), image: bytes, color: None}; 
+    pub fn new(ctx: &mut Context, id: &str, path: &'static str, size: (f32, f32), offsets: (Offset, Offset)) -> Self {
+        let image = ctx.theme.brand.illustrations.get(path);
+        let image = Image{shape: ShapeType::Rectangle(0.0, (size.0, size.1)), image, color: None}; 
         Sprite(Stack::default(), image, id.to_string(), offsets, (0.0, 0.0))
     }
 
