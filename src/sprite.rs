@@ -47,18 +47,17 @@ impl Sprite {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum SpriteAction {
-    MoveLeft,
-    MoveRight,
-    MoveUp,
-    MoveDown,
-    Jump,
-    Idle,
-    Attack,
     Hurt,
     Die,
     Shoot,
-    Slide,
-    Fall,
-    Land,
-    Crouch,
+}
+
+#[derive(Debug, Default, Clone, Copy, PartialEq)]
+pub enum SpriteState {
+    #[default]
+    Idle,
+    MovingLeft,
+    MovingRight,
+    MovingUp,
+    MovingDown,
 }

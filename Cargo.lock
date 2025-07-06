@@ -1848,6 +1848,7 @@ dependencies = [
  "android-activity",
  "async-trait",
  "block",
+ "block2 0.6.1",
  "cli-clipboard",
  "dispatch2",
  "downcast-rs 2.0.1",
@@ -1859,11 +1860,13 @@ dependencies = [
  "log",
  "ndk-context",
  "objc2 0.6.1",
+ "objc2-app-kit 0.3.1",
  "objc2-av-foundation",
  "objc2-core-media",
  "objc2-core-video",
  "objc2-foundation 0.3.1",
  "objc2-ui-kit 0.3.1",
+ "objc2-user-notifications 0.3.1",
  "rand 0.9.1",
  "raw-window-handle",
  "rusqlite",
@@ -2230,6 +2233,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "objc2-app-kit"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e6f29f568bec459b0ddff777cec4fe3fd8666d82d5a40ebd0ff7e66134f89bcc"
+dependencies = [
+ "bitflags 2.9.1",
+ "block2 0.6.1",
+ "libc",
+ "objc2 0.6.1",
+ "objc2-cloud-kit 0.3.1",
+ "objc2-core-data 0.3.1",
+ "objc2-core-foundation",
+ "objc2-core-graphics",
+ "objc2-core-image 0.3.1",
+ "objc2-foundation 0.3.1",
+ "objc2-quartz-core 0.3.1",
+]
+
+[[package]]
 name = "objc2-av-foundation"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2333,6 +2355,7 @@ version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "291fbbf7d29287518e8686417cf7239c74700fd4b607623140a7d4a3c834329d"
 dependencies = [
+ "bitflags 2.9.1",
  "objc2 0.6.1",
  "objc2-foundation 0.3.1",
 ]
@@ -2487,7 +2510,7 @@ checksum = "a1a1ae721c5e35be65f01a03b6d2ac13a54cb4fa70d8a5da293d7b0020261398"
 dependencies = [
  "block2 0.5.1",
  "objc2 0.5.2",
- "objc2-app-kit",
+ "objc2-app-kit 0.2.2",
  "objc2-foundation 0.2.2",
 ]
 
@@ -2620,7 +2643,10 @@ version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2a3f5ec77a81d9e0c5a0b32159b0cb143d7086165e79708351e02bf37dfc65cd"
 dependencies = [
+ "bitflags 2.9.1",
+ "block2 0.6.1",
  "objc2 0.6.1",
+ "objc2-core-location 0.3.1",
  "objc2-foundation 0.3.1",
 ]
 
@@ -2760,9 +2786,11 @@ dependencies = [
 name = "pelican_ui_std"
 version = "0.1.2"
 dependencies = [
+ "base64",
  "chrono",
  "downcast-rs 2.0.1",
  "dyn-clone",
+ "fast_image_resize",
  "image 0.25.6",
  "pelican_ui",
  "qrc",
@@ -4878,7 +4906,7 @@ dependencies = [
  "memmap2",
  "ndk",
  "objc2 0.5.2",
- "objc2-app-kit",
+ "objc2-app-kit 0.2.2",
  "objc2-foundation 0.2.2",
  "objc2-ui-kit 0.2.2",
  "orbclient",

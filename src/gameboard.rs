@@ -68,15 +68,15 @@ impl Gameboard {
 
     pub fn remove_sprite(&mut self, sprite: &Sprite) {
         if let Some(index) = self.2.iter().position(|item| item.id() == sprite.id()) {
+            self.0.0.remove(index+1);
             self.2.remove(index);
-            self.0.0.remove(index);
         }
     }
 
     pub fn remove_sprite_by_id(&mut self, id: &str) {
         if let Some(index) = self.2.iter().position(|item| item.id() == id) {
+            self.0.0.remove(index+1);
             self.2.remove(index);
-            self.0.0.remove(index);
         }
     }
     
@@ -105,6 +105,21 @@ impl Gameboard {
 
 impl OnEvent for Gameboard {
     fn on_event(&mut self, ctx: &mut Context, event: &mut dyn Event) -> bool {
+        if let Some(TickEvent) = event.downcast_ref::<TickEvent>() {
+            for i in 0..self.2.len() {
+                let (ax, ay) = self.2[i].position(ctx);
+                let (aw, ah) = *self.2[i].dimensions();
+
+                for j in (i + 1)..self.2.len() {
+                    let (bx, by) = self.2[j].position(ctx);
+                    let (bw, bh) = *self.2[j].dimensions();
+
+                    if ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by {
+                        ctx.trigger_event(CollisionEvent(self.2[i].id().to_string(), self.2[j].id().to_string()));
+                    }
+                }
+            }
+        }
         let mut callback = self.3.take().expect("callback should be set");
         let result = callback(self, ctx, event);
         self.3 = Some(callback);
