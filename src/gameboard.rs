@@ -105,6 +105,9 @@ impl Gameboard {
 
 impl OnEvent for Gameboard {
     fn on_event(&mut self, ctx: &mut Context, event: &mut dyn Event) -> bool {
+        let mut callback = self.3.take().expect("callback should be set");
+        callback(self, ctx, event);
+        self.3 = Some(callback);
         if let Some(TickEvent) = event.downcast_ref::<TickEvent>() {
             for i in 0..self.2.len() {
                 let (ax, ay) = self.2[i].position(ctx);
@@ -120,11 +123,7 @@ impl OnEvent for Gameboard {
                 }
             }
         }
-        let mut callback = self.3.take().expect("callback should be set");
-        let result = callback(self, ctx, event);
-        self.3 = Some(callback);
-        println!("result is {:?}", result);
-        result
+        true
     }
 }
 
