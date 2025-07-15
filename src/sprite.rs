@@ -13,7 +13,7 @@ impl OnEvent for Sprite {}
 
 impl Sprite {
     pub fn new(ctx: &mut Context, id: &str, path: &'static str, size: (f32, f32), offsets: (Offset, Offset)) -> Self {
-        let image = ctx.theme.brand.illustrations.get(path);
+        let image = ctx.theme.brand.illustrations.get(path).unwrap();
         let image = Image{shape: ShapeType::Rectangle(0.0, (size.0, size.1)), image, color: None}; 
         Sprite(Stack::default(), image, id.to_string(), offsets, (0.0, 0.0))
     }

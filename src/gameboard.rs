@@ -55,8 +55,8 @@ pub struct Gameboard(pub GameLayout, pub GameboardBackground, pub Vec<Sprite>, #
 
 impl Gameboard {
     pub fn new(ctx: &mut Context, aspect_ratio: AspectRatio, on_event: OnGameEvent) -> Self {
-        let colors = ctx.theme.colors;
-        let background = GameboardBackground::new(ctx, 1.0, 8.0, colors.background.secondary, aspect_ratio);
+        let bg = ctx.theme.colors.background.secondary;
+        let background = GameboardBackground::new(ctx, 1.0, 8.0, bg, aspect_ratio);
         Gameboard(GameLayout::new(vec![(Offset::Start, Offset::Start)], aspect_ratio), background, Vec::new(), Some(on_event))
     }
 
